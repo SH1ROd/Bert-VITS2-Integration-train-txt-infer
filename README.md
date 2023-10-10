@@ -5,7 +5,7 @@
 
 ### 请根据主目录下的训练步骤.txt中的步骤训练和推理 
 ### 适配windows的requirements.txt，加了个长文本分段推理和手机听书的api，
-### 非本专业，屎山代码.
+# 本人非本专业，第一次玩，屎山代码写着玩的，有其他造成不便的问题或侵权问题请联系b站，本人光速删除！
 ### 一些大文件没放进去：
 ### "./bert/chinese-roberta-ext-large"下的:
 ### "pytorch_model.bin"
@@ -14,5 +14,7 @@
 ### "D_0.pth"
 ### "G_0.pth"
 ### "DUR_0.pth"
+### -->暂无
 ### 以及训练好的放在"./model_saved/角色名"下的训练好的模型，
 ### 都可以去huggingface上获取，
+### b站：https://www.bilibili.com/video/BV1nu4y1t7wA
