@@ -1,3 +1,4 @@
+
 0.
     使用UVR5等软件将音频处理成wav格式并去除背景音，时长在30分钟左右
 
@@ -78,4 +79,5 @@ python train_ms.py --role kesulu --cont
 python -m tensorboard.main --logdir=logs\kesulu --host='0.0.0.0' --port=1130
 
 推理：
-将模型最新的模型文件(.pth)放到目录"./model_saved/角色名/"目录下，运行
+将模型最新的模型文件(.pth)放到目录"./model_saved/角色名/"目录下，
+执行python inference_webui.py -r 角色名

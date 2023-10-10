@@ -7,8 +7,9 @@
 ### 适配windows的requirements.txt，加了个长文本分段推理和手机听书的api，
 ### 非本专业，屎山代码.
 ### 一些大文件没放进去：
-### "./chinese-roberta-ext-large"下的:
+### "./bert/chinese-roberta-ext-large"下的:
 ### "pytorch_model.bin"
+### -->https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/tree/main
 ### "./pretrained_models"下的三个预训练模型文件:
 ### "D_0.pth"
 ### "G_0.pth"

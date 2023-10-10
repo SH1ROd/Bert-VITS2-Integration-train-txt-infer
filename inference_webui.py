@@ -166,10 +166,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--role", default="NaN", help="name of your role in ./model_saved")
     parser.add_argument("-m", "--model_dir", default="./model_saved/candace/G_2800.pth", help="path of your model")
-    # args0 = parser.parse_args()
-    # if args0.role != "NaN":
-    #     parser.add_argument("-c", "--config_dir", default=f"./model_saved/{args0.role}\config.json", help="path of your config file")
-    # else:
     parser.add_argument("-c", "--config_dir", default="./config\config.json",help="path of your config file")
     parser.add_argument("-s", "--share", default=False, help="make link public")
     parser.add_argument("-d", "--debug", action="store_true", help="enable DEBUG-LEVEL log")
