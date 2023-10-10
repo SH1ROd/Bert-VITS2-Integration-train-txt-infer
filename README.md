@@ -8,7 +8,7 @@
 # 本人非本专业，第一次玩，屎山代码写着玩的
 # 代码主要在
 # https://github.com/YYuX-1145/Bert-VITS2-Integration-package
-# https://github.com/fishaudio/Bert-VITS2这个作者
+# https://github.com/fishaudio/Bert-VITS2
 # 这两个作者的基础上修改的
 # 如有其他造成不便的问题或侵权问题请联系b站，本人光速删除！
 ### 一些大文件没放进去：
