@@ -5,7 +5,12 @@
 
 ### 请根据主目录下的训练步骤.txt中的步骤训练和推理 
 ### 适配windows的requirements.txt，加了个长文本分段推理和手机听书的api，
-# 本人非本专业，第一次玩，屎山代码写着玩的，有其他造成不便的问题或侵权问题请联系b站，本人光速删除！
+# 本人非本专业，第一次玩，屎山代码写着玩的
+# 代码主要在
+# https://github.com/YYuX-1145/Bert-VITS2-Integration-package
+# https://github.com/fishaudio/Bert-VITS2这个作者
+# 这两个作者的基础上修改的
+# 如有其他造成不便的问题或侵权问题请联系b站，本人光速删除！
 ### 一些大文件没放进去：
 ### "./bert/chinese-roberta-ext-large"下的:
 ### "pytorch_model.bin"
