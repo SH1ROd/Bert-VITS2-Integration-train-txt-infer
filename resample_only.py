@@ -10,7 +10,7 @@ import argparse
 import csv
 import whisper
 ######################################################
-role = "kesulu" # 请在这里修改说话人的名字，目前只支持中文语音
+role = "qipao" # 请在这里修改说话人的名字，目前只支持中文语音
 
 whisper_size = "medium"# 设置选用的whisper模型
 
@@ -38,7 +38,8 @@ def resample_only_audio(filepaths, save_dir="data_dir", out_sr=44100):
         wav2 = librosa.resample(wav, orig_sr=sr, target_sr=out_sr)
         wav2 /= max(wav2.max(), -wav2.min())
 
-        wav_seg_name = f"{role}_{file_idx}.wav" # 修改名字
+        # wav_seg_name = f"processed_{file_idx}.wav" # 修改名字 阿里标点模型使用这行
+        wav_seg_name = f"{role}_{file_idx}.wav" # 修改名字 普通模型
         out_fpath = save_path / wav_seg_name
         wavfile.write(out_fpath, rate=out_sr, data=(wav2 * np.iinfo(np.int16).max).astype(np.int16))
 

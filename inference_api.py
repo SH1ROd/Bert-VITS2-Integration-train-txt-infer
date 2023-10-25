@@ -75,8 +75,21 @@ def infer(text, sdp_ratio, noise_scale, noise_scale_w, length_scale, sid, hps, d
 
 def tts_fn(text, speaker, sdp_ratio, noise_scale, noise_scale_w, length_scale,hps, device, stop_time = 1.0):
 
+    # 处理换行符
+    text = text.replace("\n", "").replace("”", "'")
     # 处理中文双引号
-    text = text.replace("“", " ").replace("”", " ")
+    text = text.replace("“", "'").replace("”", "'")
+    # 处理中文书名号
+    text = text.replace("《", "'").replace("》", "'")
+    # 处理中文逗号
+    text = text.replace("，", ",")
+    # 处理中文句号
+    text = text.replace("。", ".")
+    # 处理中文问号
+    text = text.replace("？", "?")
+    # 处理中文感叹号
+    text = text.replace("！", "!")
+
     with torch.no_grad():
         audio = infer(text, sdp_ratio=sdp_ratio, noise_scale=noise_scale, noise_scale_w=noise_scale_w, length_scale=length_scale, sid=speaker, hps=hps, device=device)
     # 分段音频的头部添加自然停顿: stop_time=1.0 单位:秒

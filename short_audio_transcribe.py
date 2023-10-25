@@ -5,7 +5,7 @@ import torchaudio
 import argparse
 import torch
 ###################################################
-role="kesulu" # 修改角色名与之前一致
+role="qipao" # 修改角色名与之前一致
 ###################################################
 lang2token = {
             'zh': "[ZH]",

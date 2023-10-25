@@ -69,18 +69,31 @@ def infer(text, sdp_ratio, noise_scale, noise_scale_w, length_scale, sid):
         del x_tst, tones, lang_ids, bert, x_tst_lengths, speakers
         return audio
 
-def tts_fn(text_cut, text_cut_min_length, text, speaker, sdp_ratio, noise_scale, noise_scale_w, length_scale):
+def tts_fn(text_cut, text_cut_min_length, text, speaker, sdp_ratio, noise_scale, noise_scale_w, length_scale, speed, stop_time , seg_char):
 
-    # 处理中文双引号
-    text = text.replace("“", " ").replace("”", " ")
+    # # 处理换行符
+    # text = text.replace("\n", "").replace("”", "'")
+    # # 处理中文双引号
+    # text = text.replace("“", "'").replace("”", "'")
+    # # 处理中文书名号
+    # text = text.replace("《", "'").replace("》", "'")
+    # # 处理中文逗号
+    # text = text.replace("，", ",")
+    # # 处理中文句号
+    # text = text.replace("。", ".")
+    # # 处理中文问号
+    # text = text.replace("？", "?")
+    # # 处理中文感叹号
+    # text = text.replace("！", "!")
+
     #如果不是txt文件
     if not text_cut:
         with torch.no_grad():
             audio = infer(text, sdp_ratio=sdp_ratio, noise_scale=noise_scale, noise_scale_w=noise_scale_w, length_scale=length_scale, sid=speaker)
         return "Success", (hps.data.sampling_rate, audio)
     else:
-
-        text_segments = text.split("。")
+        text_segments = text.split(seg_char)
+        print(text_segments)
         # 初始化存储裁切后文字的列表
         text_seg = []
         # 初始化当前段落
@@ -92,58 +105,103 @@ def tts_fn(text_cut, text_cut_min_length, text, speaker, sdp_ratio, noise_scale,
             # 如果当前段落加上这个segment的长度小于等于text_cut_min_length，则将这个segment加入当前段落
             if len(current_segment) + len(segment) + 1 <= text_cut_min_length:
                 if current_segment:
-                    current_segment += "。" + segment
+                    current_segment += "." + segment
                 else:
                     current_segment = segment
             else:
-                # 如果加入这个segment超过了text_cut_min_length，则将当前段落存入text_seg列表中，并重置current_segment
-                # text_seg.append(current_segment + "。")
-                tmp = current_segment + "。"
+                tmp = current_segment + "."
+                print(tmp)
+                # print(len(tmp))
+                # print(type(tmp))
+                # 处理换行符
+                tmp = tmp.replace("\n", "")
+                # 处理中文双引号
+                tmp = tmp.replace("“", "'").replace("”", "'")
+                # 处理中文括号
+                tmp = tmp.replace("（", "'").replace("）", "'")
+                # 处理英文括号
+                tmp = tmp.replace("(", "'").replace(")", "'")
+                # 处理中文书名号
+                tmp = tmp.replace("《", "'").replace("》", "'")
+                # 处理中文逗号
+                tmp = tmp.replace("，", ",")
+                # 处理中文句号
+                tmp = tmp.replace("。", ".")
+                # 处理中文问号
+                tmp = tmp.replace("？", "?")
+                # 处理中文感叹号
+                tmp = tmp.replace("！", "!")
+
                 with torch.no_grad():
                     audio = infer(tmp, sdp_ratio=sdp_ratio, noise_scale=noise_scale, noise_scale_w=noise_scale_w,
                                   length_scale=length_scale, sid=speaker)
-                import scipy
-                resampled_audio = scipy.signal.resample(audio, int(len(audio) * 1.1))
                 #分段音频的头部添加自然停顿
-                blank = np.zeros((33100,), dtype=np.float64)
+                blank = np.zeros((int(float(stop_time) * 44100),), dtype=np.float64)
                 # audio = np.concatenate((blank, audio), axis=None)
-                audio = np.concatenate((blank, resampled_audio), axis=None)
-                # # 假设audio是一个float64类型的NumPy数组，代表音频数据
-                # # 定义渐强的长度（以样本数为单位）
-                # fade_in_length = 44100  # 例如，这里定义了渐强效果的长度为44100 个样本
-                #
-                # # 创建一个渐强的线性增加序列，范围从0到1
-                # fade_in = np.linspace(0, 1, fade_in_length)
-                #
-                # # 将音频数组的前fade_in_length个样本乘以渐强序列，实现渐强效果
-                # audio[:fade_in_length] *= fade_in
-                #
-                # # 这样，audio的前fade_in_length个样本就会受到渐强效果的影响
-                # with open("./output.txt", "a", encoding="utf-8") as f:
-                #     f.write(str(audio)+"\n\n")
-                # print(str(audio) + "\n\n")
+                audio = np.concatenate((blank, audio), axis=None)
                 sum_audio = np.concatenate((sum_audio, audio), axis=None)
-                tmp = current_segment + "。\n\n"
+                tmp = tmp +"\n\n"
                 print(tmp)
-                if index == 0:
-                    with open("./output.txt", "w", encoding="utf-8") as f:
-                        f.write(tmp)
-                else:
-                    with open("./output.txt", "a", encoding="utf-8") as f:
-                        f.write(tmp)
+                # if index == 0:
+                #     with open("./output.txt", "w", encoding="utf-8") as f:
+                #         f.write(tmp)
+                # else:
+                #     with open("./output.txt", "a", encoding="utf-8") as f:
+                #         f.write(tmp)
                 current_segment = segment
         # 将最后一个段落加入text_seg列表中
         if current_segment:
-            tmp = current_segment + "。\n\n"
-            with open("./output.txt", "a", encoding="utf-8") as f:
-                f.write(tmp)
+            tmp = current_segment + "."
+            # with open("./output.txt", "a", encoding="utf-8") as f:
+            #     f.write(tmp)
+
+            # 处理换行符
+            tmp = tmp.replace("\n", "")
+            # 处理中文双引号
+            tmp = tmp.replace("“", "'").replace("”", "'")
+            # 处理中文括号
+            tmp = tmp.replace("（", "'").replace("）", "'")
+            # 处理英文括号
+            tmp = tmp.replace("(", "'").replace(")", "'")
+            # 处理中文书名号
+            tmp = tmp.replace("《", "'").replace("》", "'")
+            # 处理中文逗号
+            tmp = tmp.replace("，", ",")
+            # 处理中文句号
+            tmp = tmp.replace("。", ".")
+            # 处理中文问号
+            tmp = tmp.replace("？", "?")
+            # 处理中文感叹号
+            tmp = tmp.replace("！", "!")
+
             with torch.no_grad():
                 audio = infer(tmp, sdp_ratio=sdp_ratio, noise_scale=noise_scale, noise_scale_w=noise_scale_w,
                               length_scale=length_scale, sid=speaker)
+            print(tmp + "\n\n")
             # 分段音频的头部添加自然停顿
-            blank = np.zeros((33100,), dtype=np.float64)
+            blank = np.zeros((int(float(stop_time) * 44100),), dtype=np.float64)
             audio = np.concatenate((blank, audio), axis=None)
             sum_audio = np.concatenate((sum_audio, audio), axis=None)
+        #变速不变调
+        import audiotsm
+        import audiotsm.io.wav
+        import audiotsm.io.array
+        # 可以直接读取文件
+        # reader = audiotsm.io.wav.WavReader("01.wav")
+
+        # 也可以加载别的地方传过来的numpy.ndarray音频数据
+        # a, sr = sf.read("qaq.wav", dtype='float32')
+        # a = a.reshape((1,-1))    # (1,-1)：（通道数，音频长度）
+        reader = audiotsm.io.array.ArrayReader(np.matrix(sum_audio))
+
+        # 可以直接写入文件
+        # writer = audiotsm.io.wav.WavWriter("02.wav", 1, 44100)  # 1：单通道。  16000：采样率
+        # 也可以直接获得numpy.ndarray的数据
+        writer = audiotsm.io.array.ArrayWriter(1)
+
+        wsola = audiotsm.wsola(1, speed=speed)  # 1：单通道。  speed：速度
+        wsola.run(reader, writer)
+        sum_audio = writer.data[0]
         return "Success", (hps.data.sampling_rate, sum_audio)
 
 
@@ -158,16 +216,13 @@ def text_file_fn(texts_obj):
 def text_cut_change_fn(flag):
     return gr.Slider(visible=flag), gr.File(visible=flag)
 
-
-# --model_dir ./model_saved/candace/G_2800.pth --config_dir ./model_saved/candace/G_.json
-# python inference_webui.py --model_dir ./model_saved/candace/G_2800.pth --config_dir ./model_saved/candace/G_.json
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--role", default="NaN", help="name of your role in ./model_saved")
     parser.add_argument("-m", "--model_dir", default="./model_saved/candace/G_2800.pth", help="path of your model")
     parser.add_argument("-c", "--config_dir", default="./config\config.json",help="path of your config file")
-    parser.add_argument("-s", "--share", default=False, help="make link public")
+    parser.add_argument("-st", "--stop_time", default=1.0, help="stop time between sentences")
+    parser.add_argument("-s", "--share", default=True, help="make link public")
     parser.add_argument("-d", "--debug", action="store_true", help="enable DEBUG-LEVEL log")
 
     args = parser.parse_args()
@@ -227,7 +282,11 @@ if __name__ == "__main__":
                 sdp_ratio = gr.Slider(minimum=0, maximum=1, value=0.2, step=0.1, label='SDP Ratio')
                 noise_scale = gr.Slider(minimum=0.1, maximum=1.5, value=0.6, step=0.1, label='Noise Scale')
                 noise_scale_w = gr.Slider(minimum=0.1, maximum=1.4, value=0.8, step=0.1, label='Noise Scale W')
-                length_scale = gr.Slider(minimum=0.1, maximum=2, value=1, step=0.1, label='Length Scale')
+                length_scale = gr.Slider(minimum=0.1, maximum=2, value=1, step=0.1, label='Length Scale(调节语速，越小越快)')
+                #调节
+                stop_time = gr.Slider(minimum=0.0, maximum=5, value=1, step=0.1, label='Paragraph interval time(长文本推理的分割停顿时长，默认1秒)')
+                seg_char = gr.Textbox(lines=1, value="。", label="Paragraph Separator character(长文本推理时用于分割的符号，默认句号)")
+                speed = gr.Slider(minimum=0.01, maximum=3, value=1, step=0.01, label='Speech speed(画蛇添足了，最好还是用上面的Length Scale调节语速)')
                 #txt文件输入
                 text_cut = gr.Checkbox(value=False, label="是否进行txt文件推理(自动裁切)")
                 text_cut_min_length = gr.Slider(interactive=True, minimum=1, maximum=400, value=100, step=1, visible=False, label='每部分最长裁切长度(过大可能导致失败)')
@@ -239,7 +298,7 @@ if __name__ == "__main__":
                 audio_output = gr.Audio(label="Output Audio")
 
         btn.click(tts_fn,
-                inputs=[text_cut, text_cut_min_length, text, speaker, sdp_ratio, noise_scale, noise_scale_w, length_scale],
+                inputs=[text_cut, text_cut_min_length, text, speaker, sdp_ratio, noise_scale, noise_scale_w, length_scale, speed, stop_time, seg_char],
                 outputs=[text_output, audio_output])
 
         text_cut.change(text_cut_change_fn,
@@ -251,4 +310,5 @@ if __name__ == "__main__":
                 outputs=text)
     
     webbrowser.open("http://127.0.0.1:7860")
+    # webbrowser.open("http://192.168.5.128:1130")
     app.launch(share=args.share)

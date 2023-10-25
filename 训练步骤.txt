@@ -1,6 +1,12 @@
+-->（使用前先装好requirements.txt中列出的包）
+-->激活虚拟环境(建议新创个虚拟环境，不会也可以直接下一步)
+-->pip install -r requirements.txt
 
 0.
-    使用UVR5等软件将音频处理成wav格式并去除背景音，时长在30分钟左右
+    a.
+        使用UVR5等软件将音频处理成wav格式并去除背景音，时长在30分钟左右
+    b.
+        先使用format.py对格式进行转换，并切分成每段8分钟，再使用MDX23去除背景
 
 1.
     使用slicer-gui.exe（主目录下）切片，参数依次为：
@@ -15,6 +21,8 @@
         在resample_only.py 中先修改role成你要训练的角色的名字
         将刚刚slicer切好的语音.wav文件放在目录"./raw/角色名/"的位置下
         ps：角色名和刚刚修改的那个要一样
+        wav_seg_name = f"processed_{file_idx}.wav" # 修改名字 阿里标点模型使用这行
+        wav_seg_name = f"{role}_{file_idx}.wav" # 修改名字 普通模型使用这行
         然后运行resample_only.py
     b.
         或者直接在主目录打开cmd，终端依次执行：
@@ -32,6 +40,9 @@
         然后运行short_audio_transcribe.py 进行语音识别文字
     b.
         或者继续在上一步完成的终端执行：python short_audio_transcribe.py --role 角色名
+    c.
+        在auto_DataLabeling_long.py中先修改role成你要训练的角色的名字
+        然后运行auto_DataLabeling_long.py 进行语音识别文字
 
 5.
     处理完成后，去"./filelists/short_character_anno.list"进行微调
@@ -50,12 +61,12 @@
 
 8.
     a.
-        然后开始训练，运行train_ms.py
+        然后开始训练，运行train_ms.py 并带参数--role 角色名
     b.
-        或者继续在上一步完成的终端执行：python train_ms.py
+        或者继续在上一步完成的终端执行：python train_ms.py --role 角色名
 
 9.
-    若训练中断要继续训练则执行：python train_ms.py --cont
+    若训练中断要继续训练则执行：python train_ms.py --role 角色名 --cont
 
 10.
     启动tensorboard，观察训练的loss：python -m tensorboard.main --logdir=logs\角色名
@@ -77,7 +88,10 @@ python bert_gen.py
 python train_ms.py --role kesulu
 python train_ms.py --role kesulu --cont
 python -m tensorboard.main --logdir=logs\kesulu --host='0.0.0.0' --port=1130
+python -m tensorboard.main --logdir=logs\qipao --host='0.0.0.0' --port=1130
+
 
 推理：
 将模型最新的模型文件(.pth)放到目录"./model_saved/角色名/"目录下，
-执行python inference_webui.py -r 角色名
+执行python inference_webui_update.py -r 角色名
+(inference_webui_update添加了设置切割符和设置切割间隔时长的功能，调节语速请使用length scale)
